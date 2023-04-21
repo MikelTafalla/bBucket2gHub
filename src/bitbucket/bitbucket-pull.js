@@ -38,42 +38,46 @@ class BitbucketPuller {
         // Returns all the commits made by the user in the specified repository
 
         let commits = [];
+        if (repo === 'cartrover') {
+            let url = (
+                `${API_URL}/repositories/${this.workspace}/${repo}/commits/` +
+                "?fields=next,values.author,values.date,values.hash"
+            );
+            
+            // do-while loop that handles the pagination of the API
+            //Avoid too many request
+            let index = 0;
+            do {
+                const data = await makeRequest("GET", url, this.headers);
 
-        let url = (
-            `${API_URL}/repositories/${this.workspace}/${repo}/commits/` +
-            "?fields=next,values.author,values.date,values.hash"
-        );
+                if (data.ok) {
 
-        // do-while loop that handles the pagination of the API
-        do {
-            const data = await makeRequest("GET", url, this.headers);
+                    data.values.forEach(item => {
 
-            if (data.ok) {
+                        const mail = this._getMail(item.author.raw);
 
-                data.values.forEach(item => {
+                        if (mail === this.usermail) {
+                            commits.push({
+                                "hash": item.hash,
+                                "date": item.date,
+                                "user": mail
+                            });
+                        }
+                    });
 
-                    const mail = this._getMail(item.author.raw);
+                    url = data.next;
+                    
+                } else {
+                    url = null;
+                }
+                index++;
+            } while (index < 12 && url !== null)
 
-                    if (mail === this.usermail) {
-                        commits.push({
-                            "hash": item.hash,
-                            "date": item.date,
-                            "user": mail
-                        });
-                    }
+            if (commits && commits.length > 0) {
+                this.commitsBuffer.push({
+                    "repo": repo, "commits": commits
                 });
-
-                url = data.next;
-            } else {
-                url = null;
             }
-
-        } while (url)
-
-        if (commits && commits.length > 0) {
-            this.commitsBuffer.push({
-                "repo": repo, "commits": commits
-            });
         }
     }
 

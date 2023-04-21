@@ -6,6 +6,7 @@ async function _logRequestError(res) {
 
     // If failed reponse includes a message append it
     try {
+        console.log(res);
         let res_json = await res.json();
         res_json.message ? msg = `:\n    "${res_json.message}"` : msg = "";
     } finally {}

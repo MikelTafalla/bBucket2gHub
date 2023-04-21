@@ -26,7 +26,7 @@ class GithubPusher {
             {
                 name: this.repo,
                 description: "Created by Bitbucket2GitHub",
-                homepage: "https://github.com/SV3A/bBucket2gHub",
+                homepage: "https://github.com/MikelTafalla/bBucket2gHub",
                 private: true,
                 auto_init: true
             });
