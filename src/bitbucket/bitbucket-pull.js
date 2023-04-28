@@ -44,10 +44,14 @@ class BitbucketPuller {
                 "?fields=next,values.author,values.date,values.hash"
             );
             
+            //To paginate change url with hard coded url from last console log
+            //url = ""; 
             // do-while loop that handles the pagination of the API
             //Avoid too many request
             let index = 0;
             do {
+                console.log(url);
+
                 const data = await makeRequest("GET", url, this.headers);
 
                 if (data.ok) {
@@ -71,7 +75,7 @@ class BitbucketPuller {
                     url = null;
                 }
                 index++;
-            } while (index < 12 && url !== null)
+            } while (index < 100 && url !== null)
 
             if (commits && commits.length > 0) {
                 this.commitsBuffer.push({
